@@ -1,0 +1,183 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                   Gold Extractor                 |
+//|                                 Developer's Site - forexroboteasy.com   |
+//|                                 Development - Forex Robot Easy Team |
+//+------------------------------------------------------------------+
+
+//+------------------------------------------------------------------+
+//|                        Global Variables                           |
+//+------------------------------------------------------------------+
+double GoldPrices[];
+double BondYield[];
+double USDStrength[];
+
+//+------------------------------------------------------------------+
+//|                       Custom Indicator                            |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   // Load historical data for gold prices
+   if (!CopyClose('XAUUSD', PERIOD_D1, 0, 100, GoldPrices))
+   {
+      Print('Failed to load gold prices data!');
+      return INIT_FAILED;
+   }
+   
+   // Load historical data for US10Y bond yield
+   if (!CopyClose('US10Y', PERIOD_D1, 0, 100, BondYield))
+   {
+      Print('Failed to load bond yield data!');
+      return INIT_FAILED;
+   }
+   
+   // Load historical data for USD strength
+   if (!CopyClose('USD', PERIOD_D1, 0, 100, USDStrength))
+   {
+      Print('Failed to load USD strength data!');
+      return INIT_FAILED;
+   }
+   
+   return INIT_SUCCEEDED;
+}
+
+//+------------------------------------------------------------------+
+//|                     Trading Functions                             |
+//+------------------------------------------------------------------+
+void TrackGoldPrice()
+{
+   // Track and analyze the price of gold in relation to bond yield changes
+   double correlation = CalculateCorrelation(GoldPrices, BondYield);
+   Print('Correlation between gold and bond yield: ', correlation);
+   
+   // Monitor USD strength and its impact on gold prices
+   double usdStrength = CalculateStrength(USDStrength);
+   Print('USD strength: ', usdStrength);
+   
+   // Sell gold and buy USD when USD strengthens, vice versa when USD weakens
+   if (usdStrength > 0)
+   {
+      SellGold();
+      BuyUSD();
+   }
+   else
+   {
+      BuyGold();
+      SellUSD();
+   }
+}
+
+double CalculateCorrelation(const double& prices[], const double& yield[])
+{
+   // Calculate correlation coefficient between two arrays
+   double sumX = 0;
+   double sumY = 0;
+   double sumXY = 0;
+   double sumX2 = 0;
+   double sumY2 = 0;
+   int size = ArraySize(prices);
+   
+   for (int i = 0; i < size; i++)
+   {
+      sumX += prices[i];
+      sumY += yield[i];
+      sumXY += prices[i] * yield[i];
+      sumX2 += prices[i] * prices[i];
+      sumY2 += yield[i] * yield[i];
+   }
+   
+   double numerator = size * sumXY - sumX * sumY;
+   double denominator = MathSqrt((size * sumX2 - sumX * sumX) * (size * sumY2 - sumY * sumY));
+   
+   return numerator / denominator;
+}
+
+double CalculateStrength(const double& strength[])
+{
+   // Calculate strength based on array values
+   double sum = 0;
+   int size = ArraySize(strength);
+   
+   for (int i = 0; i < size; i++)
+   {
+      sum += strength[i];
+   }
+   
+   return sum / size;
+}
+
+void SellGold()
+{
+   // Sell gold
+   // Code for selling gold
+}
+
+void BuyGold()
+{
+   // Buy gold
+   // Code for buying gold
+}
+
+void SellUSD()
+{
+   // Sell USD
+   // Code for selling USD
+}
+
+void BuyUSD()
+{
+   // Buy USD
+   // Code for buying USD
+}
+
+//+------------------------------------------------------------------+
+//|                     User Interface Functions                      |
+//+------------------------------------------------------------------+
+void OnChartEvent(const int id, const long& lparam, const double& dparam, const string& sparam)
+{
+   // Handle user interface events
+   switch (id)
+   {
+      case CHARTEVENT_KEYDOWN:
+         if (sparam == 's')
+         {
+            SellGold();
+         }
+         else if (sparam == 'b')
+         {
+            BuyGold();
+         }
+         else if (sparam == 'u')
+         {
+            SellUSD();
+         }
+         else if (sparam == 'd')
+         {
+            BuyUSD();
+         }
+         break;
+   }
+}
+
+//+------------------------------------------------------------------+
+//|                     Main Program                                  |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+   TrackGoldPrice();
+}
+
+//+------------------------------------------------------------------+
+//|                     Auxiliary Functions                           |
+//+------------------------------------------------------------------+
+void Print(const string& message)
+{
+   // Print messages to the terminal
+   Print(message);
+}
+
+void Print(const string& message, const double& value)
+{
+   // Print messages with values to the terminal
+   Print(message, value);
+}
